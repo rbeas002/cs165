@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 
 		RSA * rsa_private = PEM_read_bio_RSAPrivateKey(privatekey,NULL,NULL,NULL);
-    RSA_private_encrypt(EVP_MAX_MD_SIZE,(unsigned char*)mdbuf,buffer2,rsa_private,RSA_PKCS1_PADDING);
+    int x =RSA_private_encrypt(EVP_MAX_MD_SIZE,(unsigned char*)mdbuf,buffer2,rsa_private,RSA_PKCS1_PADDING);
 
 	for(int i = 0; i < mdlen; i++)
 	{
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 
 	RSA * rsa_public = PEM_read_bio_RSA_PUBKEY(publickey,NULL,NULL,NULL);
-	RSA_public_decrypt(EVP_MAX_MD_SIZE,buffer2,buffer3,rsa_public,RSA_PKCS1_PADDING);
+	RSA_public_decrypt(x,buffer2,buffer3,rsa_public,RSA_PKCS1_PADDING);
 	for(int i = 0; i < mdlen; i++)
 	{
 		//Print two hexadecimal digits (8 bits or 1 character) at a time
