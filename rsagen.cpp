@@ -1,0 +1,28 @@
+#include <iostream>
+#include <fstream>
+#include <openssl/ssl.h>
+#include <openssl/bio.h>
+#include <sstream>
+#include <string>
+using namespace std;
+
+int main(int argc, char *argv[])
+{
+	ifstream myfile;
+	myfile.open("Beasley.txt");
+	char output[1024];
+	char letter;
+	int i =0;
+	while (myfile >> noskipws>>letter)
+	{
+		output[i] = letter;
+		cout << letter;
+		i++;
+	}
+	output[i] = '\0';
+	myfile.close();	
+	for (int i =0; i<1024; i++)
+	{ while (output[i]) {
+		cout<<output[i];}}
+	return 0;
+}
