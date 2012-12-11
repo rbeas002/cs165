@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 	// 2. Receive a random number (the challenge) from the client
 	printf("2. Waiting for client to connect and send challenge...");
     
-    //SSL_read
+    //SSL_read challenge from client 
     char challenge[5];
     int lenght_cha = SSL_read(ssl, challenge , 5);cout<<lenght_cha;
 	printf("DONE.\n");
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
   	BIO_set_md(hash_new, EVP_sha1());
 	buff_new = BIO_push(hash_new,buff_new);
     int mdlen=0;
-	char hash_string[lenght_cha];cout<<sizeof(buff_new);
+	char hash_string[lenght_cha];
 	mdlen = BIO_read(buff_new, hash_string, lenght_cha);
 	string temp = buff2hex((const unsigned char*)(hash_string),mdlen);
 	printf("SUCCESS.\n");
@@ -131,29 +131,15 @@ int main(int argc, char** argv)
     RSA * rsa_private = PEM_read_bio_RSAPrivateKey(privatekey,NULL,NULL,NULL);
     int x =RSA_private_encrypt(EVP_MAX_MD_SIZE,(unsigned char*)hash_string,(unsigned char*)signature,rsa_private, RSA_PKCS1_PADDING);
     int siglen=x;
-    /*char decrypted_key[BUFFER_SIZE];
-	BIO *publickey = BIO_new_file("rsapublickey.pem", "r");
-	RSA * rsa_public = PEM_read_bio_RSA_PUBKEY(publickey,NULL,NULL,NULL);
-	int y = RSA_public_decrypt(x,(unsigned char*)signature,(unsigned char*)decrypted_key,rsa_public, RSA_PKCS1_PADDING);
-	cout <<y;
-	if (y <= 0)
-	{
-		printf("Error during RSA_public_decrypt.\n");
-		print_errors();
-		exit(EXIT_FAILURE);
-	}*/
 
     printf("DONE.\n");
     printf("    (Signed key length: %d bytes)\n", siglen);
     printf("    (Signature: \"%s\" (%d bytes))\n", buff2hex((const unsigned char*)signature, siglen).c_str(), siglen);
-	//printf("    (decrypt: \"%s\" (%d bytes))\n", buff2hex((const unsigned char*)decrypted_key, y).c_str(), y);
 
     //-------------------------------------------------------------------------
 	// 5. Send the signature to the client for authentication
 	printf("5. Sending signature to client for authentication...");
 
-	//BIO_flush(privatekey);
-	//SSL_write
 	SSL_write(ssl,signature,siglen);
 	BIO_flush(server);
     printf("DONE.\n");
@@ -175,10 +161,7 @@ int main(int argc, char** argv)
 	int bytesSent=0;
 	int extra=0;
 	char buffer[1024];
-	//BIO_flush(server);
 	BIO * reading = BIO_new_file((const char *)file,"r");
-	//BIO_puts(server, "fnf");
-    //BIO_read(bfile, buffer, BUFFER_SIZE)) > 0)
 	while((extra = BIO_read(reading, buffer, sizeof(buffer)-1)) > 0)
 	{	cout<<extra;
 		bytesSent+=SSL_write(ssl, buffer, extra);

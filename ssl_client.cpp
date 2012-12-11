@@ -94,9 +94,8 @@ int main(int argc, char** argv)
 	printf("2.  Sending challenge to the server...");
     
     string randomNumber="31337";
-	//SSL_write
+	//SSL_write challenge
 	int g=SSL_write(ssl,randomNumber.c_str(),randomNumber.size());
-    cout<<g;
     printf("SUCCESS.\n");
 	printf("    (Challenge sent: \"%s\")\n", randomNumber.c_str());
 
@@ -106,7 +105,7 @@ int main(int argc, char** argv)
 
     char buff[BUFFER_SIZE];
     
-	//SSL_read;
+	//SSL_read signed has from server;
 	int lenp=SSL_read(ssl, buff, BUFFER_SIZE);
 
 	printf("RECEIVED.\n");
@@ -116,27 +115,10 @@ int main(int argc, char** argv)
 	// 3b. Authenticate the signed key
 	printf("3b. Authenticating key...");
 	char decrypted_key[lenp];
-	//char generated_key[128];
-	//BIO_new(BIO_s_mem())
 	BIO* buff_new;
-	//buff_new = BIO_new(BIO_s_mem());
-	//BIO_write
-	//BIO_write(buff_new, buff,len);
-	//BIO_new_file
-	//PEM_read_bio_RSA_PUBKEY
-	//RSA_public_decrypt
 	BIO *publickey = BIO_new_file("rsapublickey.pem", "r");
 	RSA * rsa_public = PEM_read_bio_RSA_PUBKEY(publickey,NULL,NULL,NULL);
 	int y = RSA_public_decrypt(lenp,(unsigned char*)buff,(unsigned char*)decrypted_key,rsa_public, RSA_PKCS1_PADDING);
-	//BIO_free
-	//string temp = buff2hex((const unsigned char*)buff, lenp);
-	//printf("%s\n\n", temp.c_str());
-	if (y <= 0)
-	{
-		printf("Error during RSA_public_decrypt.\n");
-		print_errors();
-		exit(EXIT_FAILURE);
-	}
     string temp = buff2hex((const unsigned char*)buff, lenp);
 	string temp2 = buff2hex((const unsigned char*)decrypted_key, 5);
 	printf("AUTHENTICATED\n");
@@ -148,8 +130,7 @@ int main(int argc, char** argv)
 	printf("4.  Sending file request to server...");
 
 	PAUSE(2);
-	//BIO_flush
-    //BIO_puts(buff_new,filename);
+	//write filename to server
 	SSL_write(ssl, filename, 40);
 
     printf("SENT.\n");
